@@ -7,7 +7,6 @@ import { createPenPressureToggle } from '../ui/components/create-pen-pressure-to
 import brushIconImg from '/src/app/img/ui/brush-pixel.svg';
 import { IBrushUi } from '../kl-types';
 import { LANG, languageStrings } from '../../language/language';
-import { Options } from '../ui/components/options';
 import { PixelBrush } from '../brushes/pixel-brush';
 
 export const pixelBrushUi = (function () {
