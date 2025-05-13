@@ -7,11 +7,6 @@ import { throwIfNull } from '../../bb/base/base';
 import { KlHistory } from '../history/kl-history';
 import { getPushableLayerChange } from '../history/push-helpers/get-pushable-layer-change';
 
-const SHAPE_CIRCLE = 0;
-const SHAPE_SQUARE = 1;
-
-//const TWO_PI = 2 * Math.PI;
-
 export class PixelBrush {
     private klHistory: KlHistory = {} as KlHistory;
     private context: CanvasRenderingContext2D = {} as CanvasRenderingContext2D;
@@ -24,7 +19,6 @@ export class PixelBrush {
     private settingScatter: number = 0;
     private settingColor: IRGB = {} as IRGB;
     private settingColorStr: string = '';
-    private settingShapeId: number = SHAPE_CIRCLE;
     private settingLockLayerAlpha: boolean = false;
     private settingIsEraser: boolean = false;
     private settingUseDither: boolean = true;
@@ -153,42 +147,14 @@ export class PixelBrush {
             x += Math.cos(scatterAngleRad) * distance;
             y += Math.sin(scatterAngleRad) * distance;
         }
+        
+        this.context.fillRect(
+            Math.round(x + -size),
+            Math.round(y + -size),
+            Math.round(size * 2),
+            Math.round(size * 2),
+        );
 
-        if (this.settingShapeId === SHAPE_CIRCLE) {
-            /*this.context.beginPath();
-            this.context.arc(x, y, size, 0, TWO_PI);
-            this.context.closePath();
-            this.context.fill();*/ // Note: This produces a circle normally, but it's too anti-aliased! Below is a hack to get them to work properly:
-            let spaceout = 0;
-            let xdepth = 0;
-            let linewidth = 0;
-            for(let y1 = -size; y1 <= 0; y1++){
-                // Derived from x**2 + y**2 = 1, y = square root of the absolute (to avoid dealing with imaginaries) of 1 - x**2.
-                // This only gives us a semi-circle to work with instead of a full one as expected but does the job since it's drawn to the left and right with lines.
-                spaceout = size * Math.sqrt(Math.abs(1-((y1/size)**2)));
-                xdepth = Math.floor(x - spaceout);
-                linewidth = Math.floor(2 * spaceout);
-                this.context.fillRect(
-                    xdepth,
-                    Math.floor(y + y1),
-                    linewidth,
-                    1,
-                ); // In practice, we only calculate for a quarter of a circle too, since this gets mirror drawn below to cut down calculating the space-out by half
-                this.context.fillRect(
-                    xdepth,
-                    Math.floor(y - y1),
-                    linewidth,
-                    1,
-                );
-            }
-        } else {
-            this.context.fillRect(
-                Math.round(x + -size),
-                Math.round(y + -size),
-                Math.round(size * 2),
-                Math.round(size * 2),
-            );
-        }
         this.context.restore();
     }
 
@@ -414,14 +380,6 @@ export class PixelBrush {
     //IS
     isDrawing(): boolean {
         return this.inputIsDrawing;
-    }
-
-    //SET
-    setShape(a: number): void {
-        if (this.settingShapeId === a) {
-            return;
-        }
-        this.settingShapeId = a;
     }
 
     //SET

@@ -48,53 +48,6 @@ export const pixelBrushUi = (function () {
         let opacitySlider: KlSlider;
         let scatterSlider: KlSlider;
 
-        let shapeNames = [
-            LANG('brush-pen-circle'),
-            LANG('brush-pen-square'),
-        ];
-        languageStrings.subscribe(() => {
-            brushInterface.tooltip = LANG('brush-pen');
-            shapeNames = [
-                LANG('brush-pen-circle'),
-                LANG('brush-pen-square'),
-            ];
-        });
-
-        const shapeOptions = new Options({
-            optionArr: [0, 1].map((id) => {
-                const shape = BB.el({
-                    className: 'dark-invert',
-                    css: {
-                        width: '31px',
-                        height: '31px',
-                        backgroundSize: 'contain',
-                        margin: '2px',
-                    },
-                });
-                const canvas = BB.canvas(70, 70);
-                const ctx = BB.ctx(canvas);
-                if (id === 0) {
-                    ctx.beginPath();
-                    ctx.arc(35, 35, 30, 0, 2 * Math.PI);
-                    ctx.closePath();
-                    ctx.fill();
-                } else {
-                    ctx.fillRect(5, 5, 60, 60);
-                }
-                shape.style.backgroundImage = 'url(' + canvas.toDataURL('image/png') + ')';
-
-                return {
-                    id: id,
-                    label: shape,
-                    title: shapeNames[id],
-                };
-            }),
-            initId: 0,
-            onChange: (id) => {
-                brush.setShape(id);
-            },
-        });
-
         const lockAlphaToggle = new Checkbox({
             init: brush.getLockAlpha(),
             label: LANG('lock-alpha'),
@@ -220,12 +173,6 @@ export const pixelBrushUi = (function () {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                },
-            }),
-            BB.el({
-                content: shapeOptions.getElement(),
-                css: {
-                    marginTop: '10px',
                 },
             }),
             );
