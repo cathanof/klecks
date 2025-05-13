@@ -6,10 +6,10 @@ import {
     IGradient,
     IKlProject,
     IRGB,
+    TBrushUiInstance,
     TDrawEvent,
     TExportType,
     TUiLayout,
-    TBrushUiInstance,
 } from '../klecks/kl-types';
 import { importFilters } from '../klecks/filters/filters-lazy';
 import { klCanvasToPsdBlob } from '../klecks/storage/kl-canvas-to-psd-blob';
@@ -38,6 +38,7 @@ import toolShapeImg from '/src/app/img/ui/tool-shape.svg';
 import toolSelectImg from '/src/app/img/ui/tool-select.svg';
 import tabSettingsImg from '/src/app/img/ui/tab-settings.svg';
 import tabLayersImg from '/src/app/img/ui/tab-layers.svg';
+import tabEditImg from '/src/app/img/ui/tab-edit.svg';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
 import { IVector2D } from '../bb/bb-types';
 import { createConsoleApi } from './console-api';
@@ -73,6 +74,7 @@ importFilters();
 
 type KlAppOptionsEmbed = {
     url: string;
+    enableImageDropperImport?: boolean; // default false
     onSubmit: (onSuccess: () => void, onError: () => void) => void;
 };
 
@@ -1563,9 +1565,9 @@ export class KlApp {
                       this.saveToComputer.save();
                   },
                   onNewImage: showNewImageDialog,
-                  onShareImage: () => {
+                  onShareImage: (callback) => {
                       applyUncommitted();
-                      shareImage();
+                      shareImage(callback);
                   },
                   onUpload: () => {
                       // on upload
@@ -1737,7 +1739,8 @@ export class KlApp {
                 },
                 {
                     id: 'edit',
-                    label: LANG('tab-edit'),
+                    title: LANG('tab-edit'),
+                    image: tabEditImg,
                     onOpen: () => {
                         filterUi.show();
                     },
@@ -1745,7 +1748,7 @@ export class KlApp {
                         filterUi.hide();
                     },
                     css: {
-                        padding: '0 7px',
+                        minWidth: '45px',
                     },
                 },
                 {
@@ -1877,7 +1880,7 @@ export class KlApp {
             },
         );
 
-        if (!this.embed) {
+        if (!this.embed || this.embed.enableImageDropperImport) {
             new KL.KlImageDropper({
                 target: document.body,
                 onDrop: (files, optionStr) => {
